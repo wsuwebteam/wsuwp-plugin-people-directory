@@ -1,0 +1,228 @@
+$component-class-name: ".wsu-gutenberg-people-directory-profile";
+
+.block-editor-page.post-type-wsuwp_people_profile {
+    .editor-styles-wrapper .edit-post-visual-editor__post-title-wrapper {
+        margin-top: 100px;
+    }
+
+    .editor-styles-wrapper
+        .edit-post-visual-editor__post-title-wrapper
+        .editor-post-title {
+        display: none;
+    }
+}
+
+.block-editor #{$component-class-name} {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    padding: 3rem;
+
+    /*=============================================
+    =            Profile Header            =
+    =============================================*/
+    &__header {
+        display: flex;
+        flex-flow: row wrap;
+        column-gap: 1.5rem;
+        margin-bottom: 3.125rem;
+    }
+
+    &__post-title {
+        padding: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+        flex-grow: 2;
+        align-items: center;
+    }
+
+    &__nid {
+        position: relative;
+        margin-top: 0.5rem;
+        flex: 1;
+        min-width: 10rem;
+
+        .components-text-control__input {
+            padding: 0.5rem;
+        }
+    }
+
+    &__nid-copy-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+
+    &__nid-copy-notice {
+        .components-popover__content {
+            padding: 5px 7px;
+            margin-bottom: 5px;
+        }
+    }
+    /*=====  End of Profile Header  ======*/
+
+    /*=============================================
+    =            Meta Fields            =
+    =============================================*/
+    label {
+        text-transform: uppercase;
+    }
+
+    &__editor {
+        display: flex;
+        gap: 3rem;
+        flex-flow: row wrap;
+    }
+
+    &__editor-left-column {
+        flex-basis: 25%;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    &__editor-right-column {
+        flex-grow: 2;
+        min-width: 60%;
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    &__edit-field {
+    }
+
+    &__photo-field {
+        overflow: hidden;
+        background-color: rgba(0, 0, 0, 0.1);
+        aspect-ratio: 1/1;
+    }
+
+    &__photo {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+
+    &__photo-upload-btn {
+        display: block;
+        width: 100%;
+    }
+
+    &__photo-remove-btn {
+        display: block;
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    /*=====  End of Meta Fields  ======*/
+
+    &__text-control {
+        .components-text-control__input {
+        }
+    }
+
+    /*=============================================
+    =            Biography            =
+    =============================================*/
+    &__bio-container {
+    }
+
+    &__bio-header {
+        display: flex;
+        flex-flow: row wrap;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        margin: 1.5rem 0;
+        align-items: center;
+
+        h2 {
+            flex-grow: 1;
+        }
+    }
+
+    &__bio-type-toggle .components-form-toggle {
+        order: 1;
+    }
+    /*=====  End of Biography  ======*/
+}
+
+/*=============================================
+=            Multi Text Control            =
+=============================================*/
+.block-editor .wsu-gutenberg-people-directory-multi-text-control {
+    &__value {
+        position: relative;
+    }
+
+    &__insert-btn {
+        width: 100%;
+        display: block;
+        height: auto;
+    }
+
+    &__remove-btn {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        border-radius: 50%;
+    }
+}
+/*=====  End of Multi Text Control  ======*/
+
+@media screen and (min-width: 1200px) {
+    .block-editor #{$component-class-name} {
+        &__editor {
+            flex-flow: row;
+        }
+
+        &__editor-left-column {
+            min-width: 250px;
+        }
+
+        &__editor-right-column {
+            grid-template-areas:
+                "fname fname mname mname lname lname"
+                "displayname displayname displayname displayname displayname displayname"
+                "title title title title title title"
+                "phone phone phone email email email"
+                "office office office address address address"
+                "website website website website website website"
+                "degree degree degree degree degree degree";
+            row-gap: 1rem;
+            column-gap: 1.5rem;
+
+            #{$component-class-name}__edit-field {
+                &:nth-child(1) {
+                    grid-area: fname;
+                }
+                &:nth-child(2) {
+                    grid-area: mname;
+                }
+                &:nth-child(3) {
+                    grid-area: lname;
+                }
+                &:nth-child(4) {
+                    grid-area: displayname;
+                }
+                &:nth-child(5) {
+                    grid-area: title;
+                }
+                &:nth-child(6) {
+                    grid-area: phone;
+                }
+                &:nth-child(7) {
+                    grid-area: email;
+                }
+                &:nth-child(8) {
+                    grid-area: office;
+                }
+                &:nth-child(9) {
+                    grid-area: address;
+                }
+                &:nth-child(10) {
+                    grid-area: website;
+                }
+                &:nth-child(11) {
+                    grid-area: degree;
+                }
+            }
+        }
+    }
+}

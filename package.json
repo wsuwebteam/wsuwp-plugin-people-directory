@@ -1,0 +1,13 @@
+{
+    "name": "wsuwp-plugin-people-directory",
+    "scripts": {
+        "start": "wp-scripts start assets/src/profile-editor.js assets/src/settings-page.js assets/src/edit-profiles-page.js --output-path=assets/dist/",
+        "build": "wp-scripts build assets/src/profile-editor.js assets/src/settings-page.js assets/src/edit-profiles-page.js --output-path=assets/dist/"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@wordpress/scripts": "^24.4.0",
+        "lodash": "^4.17.21"
+    }
+}
