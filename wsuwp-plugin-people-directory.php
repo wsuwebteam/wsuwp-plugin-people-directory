@@ -3,7 +3,7 @@
  * Plugin Name: WSUWP People Directory
  * Plugin URI: https://github.com/wsuwebteam/wsuwp-plugin-people-directory
  * Description: Plugin to manage a local people directory.
- * Version: 0.0.1
+ * Version: 0.0.2
  * Requires PHP: 7.0
  * Author: Washington State University, Danial Bleile, Dan White
  * Author URI: https://web.wsu.edu/
@@ -20,7 +20,8 @@ add_action( 'after_setup_theme', 'wsuwp_plugin_people_directory' );
 
 function wsuwp_plugin_people_directory() {
 
-		$people_api_domain = str_ends_with( $_SERVER['HTTP_HOST'], '.local' )
+		// $people_api_domain = str_ends_with( $_SERVER['HTTP_HOST'], '.local' )
+		$people_api_domain = ( substr( $_SERVER['HTTP_HOST'], -strlen( '.local' ) ) === '.local' )
 			? 'http://peopleapi.local'
 			: 'https://people.wsu.edu';
 
