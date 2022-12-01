@@ -395,16 +395,16 @@ class Post_Type_Profile {
 
 	public static function replace_title_on_render( $title ) {
 
-		if ( is_admin() || wp_doing_ajax() ) {
-			return $title;
+		if ( is_main_query() && ! is_admin() && ! wp_doing_ajax() ) {
+
+			global $post;
+
+			$display_name = get_post_meta( $post->ID, 'wsuwp_display_name', true );
+			$title        = empty( $display_name ) ? get_post_meta( $post->ID, '_wsuwp_fallback_display_name', true ) : $display_name;
+
 		}
 
-		global $post;
-
-		$display_name = get_post_meta( $post->ID, 'wsuwp_display_name', true );
-		$display_name = empty( $display_name ) ? get_post_meta( $post->ID, '_wsuwp_fallback_display_name', true ) : $display_name;
-
-		return $display_name ?: $title;
+		return $title;
 
 	}
 

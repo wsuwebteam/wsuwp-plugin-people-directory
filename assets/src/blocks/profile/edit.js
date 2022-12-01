@@ -12,7 +12,7 @@ import {
     MediaUpload,
     MediaUploadCheck,
 } from "@wordpress/block-editor";
-import { useCopyToClipboard } from "@wordpress/compose";
+// import { useCopyToClipboard } from "@wordpress/compose";
 
 import MultiTextControl from "../../controls/multi-text-control";
 
@@ -96,12 +96,12 @@ export default function Edit({
         photo: defaultPostMeta.wsuwp_photo,
     });
 
-    const copyNid = useCopyToClipboard(
-        defaultPostMeta._wsuwp_nid,
-        function (ref) {
-            setShowCopied(() => true);
-        }
-    );
+    // const copyNid = useCopyToClipboard(
+    //     defaultPostMeta._wsuwp_nid,
+    //     function (ref) {
+    //         setShowCopied(() => true);
+    //     }
+    // );
 
     function updateMetaField(key, value) {
         setPostMeta((prevState) => ({
@@ -177,7 +177,7 @@ export default function Edit({
                                 disabled
                             />
                             <Button
-                                ref={copyNid}
+                                // ref={copyNid}
                                 className={`${CSSNAMESPACE}__nid-copy-btn`}
                                 label="Copy"
                                 icon="admin-page"
