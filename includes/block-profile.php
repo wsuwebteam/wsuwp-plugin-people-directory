@@ -15,10 +15,9 @@ class Block_Profile {
 		$display_name = $meta['wsuwp_display_name'] ?: $meta['_wsuwp_fallback_display_name'];
 		$name         = ! empty( $display_name ) ? $display_name : get_the_title();
 
-        $photo_id = $meta['wsuwp_photo'];
-        $photo_url = $photo_id ? wp_get_attachment_image_src( $photo_id, 'medium' )[0] : $meta['_wsuwp_fallback_photo'];
-        $photo_srcset = $photo_id ? wp_get_attachment_image_srcset( $photo_id ) : $meta['_wsuwp_fallback_photo_srcset'];
-
+		$photo_id     = $meta['wsuwp_photo'];
+		$photo_url    = $photo_id ? wp_get_attachment_image_src( $photo_id, 'medium' )[0] : $meta['_wsuwp_fallback_photo'];
+		$photo_srcset = $photo_id ? wp_get_attachment_image_srcset( $photo_id ) : $meta['_wsuwp_fallback_photo_srcset'];
 
 		return array(
 			'name'           => $name,
