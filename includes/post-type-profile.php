@@ -395,7 +395,7 @@ class Post_Type_Profile {
 
 	public static function replace_title_on_render( $title ) {
 
-		if ( is_main_query() && ! is_admin() && ! wp_doing_ajax() ) {
+		if ( in_the_loop() && ! is_admin() && ! wp_doing_ajax() ) {
 
 			global $post;
 
