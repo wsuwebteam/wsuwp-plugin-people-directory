@@ -397,11 +397,14 @@ class Post_Type_Profile {
 
 		if ( in_the_loop() && ! is_admin() && ! wp_doing_ajax() ) {
 
-			global $post;
+			if ( get_post_type() === self::$slug ) {
 
-			$display_name = get_post_meta( $post->ID, 'wsuwp_display_name', true );
-			$title        = empty( $display_name ) ? get_post_meta( $post->ID, '_wsuwp_fallback_display_name', true ) : $display_name;
+				$post_id = get_the_ID();
 
+				$display_name = get_post_meta( $post_id, 'wsuwp_display_name', true );
+				$title        = empty( $display_name ) ? get_post_meta( $post_id, '_wsuwp_fallback_display_name', true ) : $display_name;
+
+			}
 		}
 
 		return $title;
