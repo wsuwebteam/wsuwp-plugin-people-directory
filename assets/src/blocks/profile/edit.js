@@ -4,6 +4,7 @@ import {
     ToggleControl,
     Button,
     Popover,
+    ClipboardButton,
 } from "@wordpress/components";
 import { useState, useEffect, useRef } from "@wordpress/element";
 import { useSelect, useDispatch } from "@wordpress/data";
@@ -28,6 +29,7 @@ export default function Edit({
     ...props
 }) {
     const { editPost } = useDispatch("core/editor");
+    const nidInput = useRef(null);
     const [showCopied, setShowCopied] = useState(false);
 
     const { defaultPostTitle, defaultPostMeta } = useSelect((select) => {
@@ -162,11 +164,15 @@ export default function Edit({
                         </h1>
                     )}
                     {defaultPostMeta._wsuwp_nid && (
-                        <div className={`${CSSNAMESPACE}__nid`}>
+                        <div ref={nidInput} className={`${CSSNAMESPACE}__nid`}>
                             {showCopied && (
                                 <Popover
                                     className={`${CSSNAMESPACE}__nid-copy-notice`}
-                                    placement="top-end"
+                                    placement="top-end" // v6
+                                    position="top left" // v5
+                                    getAnchorRect={() => {
+                                        return nidInput.current.getBoundingClientRect();
+                                    }}
                                 >
                                     Copied!
                                 </Popover>
@@ -176,12 +182,21 @@ export default function Edit({
                                 value={defaultPostMeta._wsuwp_nid}
                                 disabled
                             />
-                            <Button
+                            {/* <Button
                                 // ref={copyNid}
                                 className={`${CSSNAMESPACE}__nid-copy-btn`}
                                 label="Copy"
                                 icon="admin-page"
-                            ></Button>
+                            ></Button> */}
+                            <ClipboardButton
+                                className={`${CSSNAMESPACE}__nid-copy-btn`}
+                                text={defaultPostMeta._wsuwp_nid}
+                                onCopy={() => {
+                                    setShowCopied(() => true);
+                                }}
+                            >
+                                <span class="dashicon dashicons dashicons-admin-page"></span>
+                            </ClipboardButton>
                         </div>
                     )}
                 </div>

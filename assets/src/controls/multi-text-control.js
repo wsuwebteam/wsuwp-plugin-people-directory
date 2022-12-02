@@ -68,10 +68,11 @@ const MultiTextControl = (props) => {
 
             <Button
                 className={`${CSSNAMESPACE}__insert-btn`}
-                text={insertText}
-                variant="secondary"
+                isSecondary
                 onClick={insertValue}
-            />
+            >
+                {insertText}
+            </Button>
         </>
     );
 };

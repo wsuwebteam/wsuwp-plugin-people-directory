@@ -383,7 +383,8 @@ class Post_Type_Profile {
 			wp_enqueue_script( 'thickbox' );
 			wp_enqueue_style( 'thickbox' );
 
-			$script  = 'const editProfilePageData = {';
+			$script  = 'const EDIT_PROFILE_PAGE_DATA = {';
+			$script .= 'siteUrl: "' . site_url() . '",';
 			$script .= 'universityOrganization: "' . esc_html( get_option( 'wsu_people_directory_university_organization' ) ) . '",';
 			$script .= '};';
 

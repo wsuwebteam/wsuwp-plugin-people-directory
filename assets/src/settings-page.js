@@ -120,7 +120,8 @@ jQuery(document).ready(function () {
 
             if (nids.trim() !== "") {
                 const response = await fetch(
-                    "/wp-json/people-directory-api/v1/import-profiles",
+                    SETTINGS_PAGE_DATA.siteUrl +
+                        "/wp-json/people-directory-api/v1/import-profiles",
                     {
                         method: "POST",
                         body: new URLSearchParams({
