@@ -137,6 +137,12 @@ class Page_Settings {
 		if ( 'settings_page_people_directory' === $hook ) {
 			wp_enqueue_script( 'wsuwp-plugin-people-directory-settings-page-scripts' );
 			wp_enqueue_style( 'wsuwp-plugin-people-directory-settings-page-styles' );
+
+			$script  = 'const SETTINGS_PAGE_DATA = {';
+			$script .= 'siteUrl: "' . site_url() . '",';
+			$script .= '};';
+
+			wp_add_inline_script( 'wsuwp-plugin-people-directory-settings-page-scripts', $script, 'before' );
 		}
 
 	}
@@ -149,6 +155,7 @@ class Page_Settings {
 			return;
 		}
 
+		$selected_university_org = get_option( 'wsu_people_directory_university_organization' );
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -167,7 +174,7 @@ class Page_Settings {
 							<td>
 								<div class="form-field term-description-wrap">
 										<label for="profile-nids">List profile nids to import. One per line.</label>
-										<textarea id="profile-nids" rows="10" placeholder="butch.cougar"></textarea>
+										<textarea id="profile-nids" rows="10" placeholder="butch.cougar" <?php echo empty( $selected_university_org ) ? 'disabled' : ''; ?>></textarea>
 									</div>
 									<p class="submit">
 										<button type="button" id="import-profiles-btn" class="button button-primary">Import Profiles</button>		<span class="spinner"></span>

@@ -55,6 +55,7 @@ $component-class-name: ".wsu-gutenberg-people-directory-profile";
         .components-popover__content {
             padding: 5px 7px;
             margin-bottom: 5px;
+            min-width: auto;
         }
     }
     /*=====  End of Profile Header  ======*/
@@ -136,6 +137,10 @@ $component-class-name: ".wsu-gutenberg-people-directory-profile";
         }
     }
 
+    &__bio-type-toggle .components-base-control__field {
+        gap: 12px;
+    }
+
     &__bio-type-toggle .components-form-toggle {
         order: 1;
     }
@@ -162,6 +167,7 @@ $component-class-name: ".wsu-gutenberg-people-directory-profile";
         top: 50%;
         transform: translate(-50%, -50%);
         border-radius: 50%;
+        min-width: 24px;
     }
 }
 /*=====  End of Multi Text Control  ======*/

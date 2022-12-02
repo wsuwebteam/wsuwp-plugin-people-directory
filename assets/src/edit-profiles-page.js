@@ -55,7 +55,8 @@ jQuery(document).ready(function () {
                 submitButton.prop("disabled", true);
 
                 const response = await fetch(
-                    "/wp-json/people-directory-api/v1/import-profiles",
+                    EDIT_PROFILE_PAGE_DATA.siteUrl +
+                        "/wp-json/people-directory-api/v1/import-profiles",
                     {
                         method: "POST",
                         body: new URLSearchParams({
@@ -103,7 +104,7 @@ jQuery(document).ready(function () {
             notice.addClass("hidden");
             noticeMessage.html("");
 
-            if (!editProfilePageData.universityOrganization) {
+            if (!EDIT_PROFILE_PAGE_DATA.universityOrganization) {
                 notice.removeClass("hidden");
                 noticeMessage.html(
                     `An organization slug must be selected on the <a href="/wp-admin/options-general.php?page=people_directory">People Directory settings page</a> before importing profiles.`
