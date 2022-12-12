@@ -63,6 +63,26 @@
 	</div>
 </div>
 
+<?php
+if ( ! empty( $data['degrees'] ) ) :
+	?>
+<div class="wsu-profile__degrees">
+	<h2 class="wsu-heading--style-marked">Education</h2>
+	<ul>
+		<?php
+		foreach ( $data['degrees'] as $degree ) {
+			echo '<li>' . esc_attr( $degree ) . '</li>';
+		}
+		?>
+	</ul>
+</div>
+<?php endif; ?>
+
+<?php
+if ( ! empty( $data['bio'] ) ) :
+	?>
 <div class="wsu-profile__bio">
+	<h2 class="wsu-heading--style-marked">Biography</h2>
 	<?php echo $data['bio']; ?>
 </div>
+<?php endif; ?>
