@@ -1,13 +1,15 @@
 <div class="wsu-profile">
-	<?php
-	if ( $data['photo'] || $data['photo_srcset'] ) {
-		?>
-			<div class="wsu-profile__photo-container">
-				<img class="wsu-profile__photo" src="<?php echo esc_attr( $data['photo'] ); ?>" srcset="<?php echo esc_attr( $data['photo_srcset'] ); ?>" alt=""/>
-			</div>
+
+	<div class="wsu-profile__photo-container">
 		<?php
-	}
-	?>
+		if ( $data['photo'] || $data['photo_srcset'] ) {
+			?>
+			<img class="wsu-profile__photo" src="<?php echo esc_attr( $data['photo'] ); ?>" srcset="<?php echo esc_attr( $data['photo_srcset'] ); ?>" alt=""/>
+			<?php
+		}
+		?>
+	</div>
+
 
 	<div class="wsu-profile__details-container">
 		<?php
