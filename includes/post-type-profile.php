@@ -377,7 +377,7 @@ class Post_Type_Profile {
 
 	public static function profile_import_control( $hook ) {
 
-		if ( 'edit.php' === $hook && 'wsuwp_people_profile' === get_current_screen()->post_type ) {
+		if ( ( 'edit.php' === $hook || 'post.php' === $hook ) && 'wsuwp_people_profile' === get_current_screen()->post_type ) {
 			wp_enqueue_script( 'wsuwp-plugin-people-directory-edit-profiles-page-scripts' );
 			wp_enqueue_style( 'wsuwp-plugin-people-directory-edit-profiles-page-styles' );
 			wp_enqueue_script( 'thickbox' );
