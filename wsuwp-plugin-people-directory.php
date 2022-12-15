@@ -3,7 +3,7 @@
  * Plugin Name: (Beta) WSUWP People Directory
  * Plugin URI: https://github.com/wsuwebteam/wsuwp-plugin-people-directory
  * Description: Plugin to manage a local people directory.
- * Version: 0.1.3
+ * Version: 0.1.4
  * Requires PHP: 7.0
  * Author: Washington State University, Danial Bleile, Dan White
  * Author URI: https://web.wsu.edu/
