@@ -19,8 +19,13 @@ class Profiles_Importer {
 			return new \WP_Error( 'error', 'An organization slug must be seleted on the People Directory settings page before importing profiles.', array( 'status' => 500 ) );
 		}
 
-		$params = $request->get_body_params();
-		$nids   = array_map( 'trim', explode( '\n', $params['nids'] ) );
+		$params             = $request->get_body_params();
+		$nids               = array_map( 'trim', explode( '\n', $params['nids'] ) );
+		$unpublish_profiles = $params['unpublishProfiles'];
+
+		if ( 'true' === $unpublish_profiles ) {
+			self::unpublish_excluded_profiles( $nids ); // unpublish profiles not listed in list of nids
+		}
 
 		$nids = self::prevent_duplicates( $nids );
 
@@ -48,6 +53,43 @@ class Profiles_Importer {
 			),
 			200
 		);
+
+	}
+
+
+	private static function unpublish_excluded_profiles( $nids ) {
+
+		$args = array(
+			'posts_per_page' => -1,
+			'post_type'      => Post_Type_Profile::get( 'post_type' ),
+			'meta_query'     => array(
+				array(
+					'key'     => '_wsuwp_nid',
+					'value'   => array_map( 'trim', $nids ),
+					'compare' => 'NOT IN',
+				),
+			),
+		);
+
+		$query = new \WP_Query( $args );
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$id = get_the_ID();
+
+				$nid = get_post_meta( $id, '_wsuwp_nid', true );
+
+				if ( ! empty( $nid ) ) {
+					wp_update_post(
+						array(
+							'ID'          => $id,
+							'post_status' => 'draft',
+						)
+					);
+				}
+			}
+		}
 
 	}
 

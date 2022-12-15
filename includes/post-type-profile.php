@@ -413,34 +413,53 @@ class Post_Type_Profile {
 	}
 
 
+	private static function get_custom_bio_from_content( $content ) {
+
+		$blocks = parse_blocks( $content );
+
+		$profile_block = current(
+			array_filter(
+				$blocks,
+				function( $block ) {
+					return $block['blockName'] === 'wsuwp/people-directory-profile';
+				}
+			)
+		);
+
+		if ( true === $profile_block['attrs']['hasCustomBio'] ) {
+
+			$html = '';
+
+			foreach ( $profile_block['innerBlocks'] as $block ) {
+				$html .= render_block( $block );
+			}
+
+			return array(
+				'hasCustomBio' => true,
+				'html'         => $html,
+			);
+		}
+
+		return array(
+			'hasCustomBio' => false,
+			'html'         => '',
+		);
+
+	}
+
+
 	public static function render_content_for_rest_requests( $content ) {
 
 		global $post;
 
 		if ( defined( 'REST_REQUEST' ) && $post->post_type === self::$slug ) {
+			$custom_bio = self::get_custom_bio_from_content( $content );
 
-			$blocks = parse_blocks( $content );
-
-			$profile_block = current(
-				array_filter(
-					$blocks,
-					function( $block ) {
-						return $block['blockName'] === 'wsuwp/people-directory-profile';
-					}
-				)
-			);
-
-			if ( true === $profile_block['attrs']['hasCustomBio'] ) {
-
-				$html = '';
-
-				foreach ( $profile_block['innerBlocks'] as $block ) {
-					$html .= render_block( $block );
-				}
-
-				return $html;
+			if ( true === $custom_bio['hasCustomBio'] ) {
+				return $custom_bio['html'];
 			}
 
+			// fallback to fallback bio
 			$fallback_bio = get_post_meta( $post->ID, '_wsuwp_fallback_bio', true );
 
 			return $fallback_bio;
@@ -451,14 +470,152 @@ class Post_Type_Profile {
 	}
 
 
+	public static function manage_columns( $columns ) {
+
+		$custom_col_order = array(
+			'cb'                            => $columns['cb'],
+			'title'                         => $columns['title'],
+			'nid'                           => __( 'nid', 'textdomain' ),
+			'has_bio'                       => __( 'Has Bio', 'textdomain' ),
+			'categories'                    => $columns['categories'],
+			'tags'                          => $columns['tags'],
+			'taxonomy-wsuwp_university_org' => $columns['taxonomy-wsuwp_university_org'],
+			'date'                          => $columns['date'],
+			'Modified'                      => $columns['Modified'],
+		);
+
+		return $custom_col_order;
+
+	}
+
+
+	public static function manage_custom_column( $column, $post_id ) {
+
+		switch ( $column ) {
+
+			case 'nid':
+				echo get_post_meta( $post_id, '_wsuwp_nid', true );
+				break;
+
+			case 'has_bio':
+				$post_content = apply_filters( 'the_content', get_post_field( 'post_content', $post_id ) );
+				$custom_bio   = self::get_custom_bio_from_content( $post_content );
+				$fallback_bio = get_post_meta( $post_id, '_wsuwp_fallback_bio', true );
+
+				echo ( ( true === $custom_bio['hasCustomBio'] && ! empty( trim( strip_tags( $custom_bio['html'] ) ) ) )
+					|| ( false === $custom_bio['hasCustomBio'] && ! empty( trim( strip_tags( $fallback_bio ) ) ) ) ) ? '<i class="dashicons-before dashicons-yes-alt wsuwp-profiles-page__color--success"></i>' : '<i class="dashicons-before dashicons-dismiss wsuwp-profiles-page__color--failure"></i>';
+
+				break;
+
+		}
+
+	}
+
+
+	public static function manage_sortable_columns( $columns ) {
+
+		// Reference if we need to make has_bio sortable
+		// https://wordpress.stackexchange.com/a/293403
+
+		$columns['nid'] = 'nid';
+		return $columns;
+
+	}
+
+
+	public static function pre_get_posts( $query ) {
+
+		if ( ! is_admin() || ! $query->is_main_query() ) {
+			return;
+		}
+
+		if ( 'nid' === $query->get( 'orderby' ) ) {
+			$query->set( 'orderby', 'meta_value' );
+			$query->set( 'meta_key', '_wsuwp_nid' );
+			$query->set( 'meta_type', 'string' );
+		}
+
+	}
+
+
+	public static function manage_taxonomies_for_columns( $taxonomies ) {
+
+		$taxonomies[] = 'wsuwp_university_org';
+		return $taxonomies;
+
+	}
+
+
+	public static function bulk_actions( $bulk_array ) {
+
+		$bulk_array['wsu_update_profiles'] = 'Update Profiles';
+		return $bulk_array;
+
+	}
+
+
+	public static function handle_bulk_actions( $redirect, $action, $profile_ids ) {
+
+		if ( 'wsu_update_profiles' === $action ) {
+			$updated_profiles = Profiles_Updater::update_profiles( $profile_ids );
+
+			if ( is_wp_error( $updated_profiles ) ) {
+				return add_query_arg(
+					'update_profiles_error',
+					'',
+					$redirect
+				);
+			}
+
+			return add_query_arg(
+				'update_profiles',
+				count( $updated_profiles ),
+				$redirect
+			);
+		}
+
+	}
+
+
+	public static function admin_notices() {
+
+		if ( isset( $_REQUEST['update_profiles'] ) ) {
+			$count   = (int) $_REQUEST['update_profiles'];
+			$message = sprintf(
+				_n(
+					'%d profile was updated.',
+					'%d profiles were updated.',
+					$count
+				),
+				$count
+			);
+
+			echo '<div class="updated notice is-dismissible"><p>' . $message . '</p></div>';
+		}
+
+		if ( isset( $_REQUEST['update_profiles_error'] ) ) {
+			echo '<div class="notice notice-error is-dismissible"><p>Something went wrong. Please try again.</p></div>';
+		}
+
+	}
+
+
 	public static function init() {
 
 		add_action( 'init', array( __CLASS__, 'register_post_type' ), 11 );
 		add_action( 'transition_post_status', array( __CLASS__, 'handle_post_status_transititon' ), 10, 3 );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'profile_import_control' ) );
+		add_action( 'manage_' . self::$slug . '_posts_custom_column', __CLASS__ . '::manage_custom_column', 10, 2 );
+		add_action( 'pre_get_posts', __CLASS__ . '::pre_get_posts' );
+		add_action( 'admin_notices', __CLASS__ . '::admin_notices' );
 
 		add_filter( 'the_title', __CLASS__ . '::replace_title_on_render', 100 );
 		add_filter( 'the_content', __CLASS__ . '::render_content_for_rest_requests', 99 );
+		add_filter( 'manage_' . self::$slug . '_posts_columns', __CLASS__ . '::manage_columns' );
+		add_filter( 'manage_edit-' . self::$slug . '_sortable_columns', __CLASS__ . '::manage_sortable_columns' );
+		add_filter( 'manage_taxonomies_for_' . self::$slug . '_columns', __CLASS__ . '::manage_taxonomies_for_columns' );
+		add_filter( 'bulk_actions-edit-' . self::$slug, __CLASS__ . '::bulk_actions' );
+		add_filter( 'handle_bulk_actions-edit-' . self::$slug, __CLASS__ . '::handle_bulk_actions', 10, 3 );
 
 	}
 
