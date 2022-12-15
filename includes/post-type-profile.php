@@ -502,8 +502,8 @@ class Post_Type_Profile {
 				$custom_bio   = self::get_custom_bio_from_content( $post_content );
 				$fallback_bio = get_post_meta( $post_id, '_wsuwp_fallback_bio', true );
 
-				echo ( ( true === $custom_bio['hasCustomBio'] && ! empty( $custom_bio['html'] ) )
-					|| ( false === $custom_bio['hasCustomBio'] && ! empty( $fallback_bio ) ) ) ? '<i class="dashicons-before dashicons-yes-alt wsuwp-profiles-page__color--success"></i>' : '<i class="dashicons-before dashicons-dismiss wsuwp-profiles-page__color--failure"></i>';
+				echo ( ( true === $custom_bio['hasCustomBio'] && ! empty( trim( strip_tags( $custom_bio['html'] ) ) ) )
+					|| ( false === $custom_bio['hasCustomBio'] && ! empty( trim( strip_tags( $fallback_bio ) ) ) ) ) ? '<i class="dashicons-before dashicons-yes-alt wsuwp-profiles-page__color--success"></i>' : '<i class="dashicons-before dashicons-dismiss wsuwp-profiles-page__color--failure"></i>';
 
 				break;
 
@@ -546,6 +546,60 @@ class Post_Type_Profile {
 	}
 
 
+	public static function bulk_actions( $bulk_array ) {
+
+		$bulk_array['wsu_update_profiles'] = 'Update Profiles';
+		return $bulk_array;
+
+	}
+
+
+	public static function handle_bulk_actions( $redirect, $action, $profile_ids ) {
+
+		if ( 'wsu_update_profiles' === $action ) {
+			$updated_profiles = Profiles_Updater::update_profiles( $profile_ids );
+
+			if ( is_wp_error( $updated_profiles ) ) {
+				return add_query_arg(
+					'update_profiles_error',
+					'',
+					$redirect
+				);
+			}
+
+			return add_query_arg(
+				'update_profiles',
+				count( $updated_profiles ),
+				$redirect
+			);
+		}
+
+	}
+
+
+	public static function admin_notices() {
+
+		if ( isset( $_REQUEST['update_profiles'] ) ) {
+			$count   = (int) $_REQUEST['update_profiles'];
+			$message = sprintf(
+				_n(
+					'%d profile was updated.',
+					'%d profiles were updated.',
+					$count
+				),
+				$count
+			);
+
+			echo '<div class="updated notice is-dismissible"><p>' . $message . '</p></div>';
+		}
+
+		if ( isset( $_REQUEST['update_profiles_error'] ) ) {
+			echo '<div class="notice notice-error is-dismissible"><p>Something went wrong. Please try again.</p></div>';
+		}
+
+	}
+
+
 	public static function init() {
 
 		add_action( 'init', array( __CLASS__, 'register_post_type' ), 11 );
@@ -553,12 +607,15 @@ class Post_Type_Profile {
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'profile_import_control' ) );
 		add_action( 'manage_' . self::$slug . '_posts_custom_column', __CLASS__ . '::manage_custom_column', 10, 2 );
 		add_action( 'pre_get_posts', __CLASS__ . '::pre_get_posts' );
+		add_action( 'admin_notices', __CLASS__ . '::admin_notices' );
 
 		add_filter( 'the_title', __CLASS__ . '::replace_title_on_render', 100 );
 		add_filter( 'the_content', __CLASS__ . '::render_content_for_rest_requests', 99 );
 		add_filter( 'manage_' . self::$slug . '_posts_columns', __CLASS__ . '::manage_columns' );
 		add_filter( 'manage_edit-' . self::$slug . '_sortable_columns', __CLASS__ . '::manage_sortable_columns' );
 		add_filter( 'manage_taxonomies_for_' . self::$slug . '_columns', __CLASS__ . '::manage_taxonomies_for_columns' );
+		add_filter( 'bulk_actions-edit-' . self::$slug, __CLASS__ . '::bulk_actions' );
+		add_filter( 'handle_bulk_actions-edit-' . self::$slug, __CLASS__ . '::handle_bulk_actions', 10, 3 );
 
 	}
 

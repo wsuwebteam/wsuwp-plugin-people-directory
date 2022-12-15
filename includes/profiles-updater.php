@@ -3,10 +3,12 @@
 class Profiles_Updater {
 	use Profile_Data_Trait;
 
-	private static function get_local_profiles() {
+	private static function get_local_profiles( $profile_ids ) {
+
+		$posts_per_page = empty( $profile_ids ) ? 50 : -1;
 
 		$args = array(
-			'posts_per_page' => 50,
+			'posts_per_page' => $posts_per_page,
 			'post_type'      => Post_Type_Profile::get( 'post_type' ),
 			'orderby'        => 'modified',
 			'order'          => 'ASC',
@@ -18,6 +20,10 @@ class Profiles_Updater {
 				),
 			),
 		);
+
+		if ( ! empty( $profile_ids ) ) {
+			$args['post__in'] = $profile_ids;
+		}
 
 		$query = new \WP_Query( $args );
 
@@ -47,11 +53,11 @@ class Profiles_Updater {
 
 	}
 
-	private static function update_profiles() {
+	public static function update_profiles( $profile_ids = array() ) {
 
 		try {
 			// get local profiles
-			$local_profiles = self::get_local_profiles();
+			$local_profiles = self::get_local_profiles( $profile_ids );
 
 			if ( empty( $local_profiles ) ) {
 				return;
@@ -66,7 +72,7 @@ class Profiles_Updater {
 
 			if ( is_wp_error( $remote_profiles ) ) {
 				error_log( $remote_profiles->get_error_message() );
-				return;
+				return $remote_profiles;
 			}
 
 			// add remote profiles to associative array
@@ -77,8 +83,11 @@ class Profiles_Updater {
 				// error_log( 'Updating profile - ' . $assoc_profile['local_profile']->post_title . ' | Last modified - ' . $assoc_profile['local_profile']->post_modified );
 				self::update_profile( $nid, $assoc_profile );
 			}
+
+			return $assoc_profiles;
 		} catch ( Exception $e ) {
 			error_log( $e->getMessage() );
+			return new WP_Error( 'error', $e->getMessage() );
 		}
 
 	}
