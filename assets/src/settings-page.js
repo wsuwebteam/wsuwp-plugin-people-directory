@@ -15,8 +15,11 @@ jQuery(document).ready(function () {
             tagParent: createForm.find("#parent"),
             tagDescription: createForm.find("#tag-description"),
         };
+        const listProfilesButton = $("#list-profiles-btn");
         const importProfilesButton = $("#import-profiles-btn");
+        const importButtonSpinner = $(".wsu-import-submit__container .spinner");
         const profileNidsTextarea = $("#profile-nids");
+        const unpublishProfilesCheckbox = $("#unpublish-profiles");
 
         const apiEndpoint = window.location.hostname.includes(".local")
             ? "http://peopleapi.local/wp-json/peopleapi/v1/"
@@ -115,10 +118,14 @@ jQuery(document).ready(function () {
                 .split("\n")
                 .map((e) => e.trim())
                 .join("\\n");
+            const unpublishProfiles = unpublishProfilesCheckbox.is(":checked");
 
             resetNotification(notice);
 
             if (nids.trim() !== "") {
+                importProfilesButton.prop("disabled", true);
+                importButtonSpinner.addClass("is-active");
+
                 const response = await fetch(
                     SETTINGS_PAGE_DATA.siteUrl +
                         "/wp-json/people-directory-api/v1/import-profiles",
@@ -126,6 +133,7 @@ jQuery(document).ready(function () {
                         method: "POST",
                         body: new URLSearchParams({
                             nids: nids,
+                            unpublishProfiles: unpublishProfiles,
                         }),
                     }
                 );
@@ -141,6 +149,9 @@ jQuery(document).ready(function () {
             } else {
                 showNotification("error", "The nids field cannot be empty.");
             }
+
+            importProfilesButton.prop("disabled", false);
+            importButtonSpinner.removeClass("is-active");
         }
 
         function bindEvents() {
@@ -152,6 +163,12 @@ jQuery(document).ready(function () {
             createForm.find("#submit").on("click", submitCreateForm);
 
             importProfilesButton.on("click", importProfiles);
+
+            listProfilesButton.on("click", function (e) {
+                window.location.href +=
+                    (window.location.href.indexOf("?") > -1 ? "&" : "?") +
+                    "list-profiles=true";
+            });
         }
 
         function init() {

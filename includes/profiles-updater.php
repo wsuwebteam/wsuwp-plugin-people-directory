@@ -38,7 +38,8 @@ class Profiles_Updater {
 					'post_status' => 'draft',
 				)
 			);
-				return;
+
+			return;
 		}
 
 		$profile = self::create_profile( $profile_data['remote_profile'], $profile_id );

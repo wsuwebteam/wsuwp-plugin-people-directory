@@ -57,10 +57,10 @@ class Page_Settings {
 			self::$options_group,
 			array(
 				'id'          => 'taxonomy-updates-input',
-				'label'       => '',
+				'label'       => 'Enable keeping taxonomy names up to date with WSU People Directory information',
 				'label_for'   => 'wsu_people_directory_enable_taxonomy_updates',
 				'class'       => '',
-				'description' => 'If enabled, taxonomy names will be kept up to date with information from the main WSU People Directory.',
+				'description' => '',
 			)
 		);
 
@@ -72,10 +72,10 @@ class Page_Settings {
 			self::$options_group,
 			array(
 				'id'          => 'profile-updates-input',
-				'label'       => '',
+				'label'       => 'Enable keeping profiles up to date with WSU People Directory information',
 				'label_for'   => 'wsu_people_directory_enable_profile_updates',
 				'class'       => '',
-				'description' => 'If enabled, profiles will be kept up to date with information from the main WSU People Directory.',
+				'description' => '',
 			)
 		);
 
@@ -148,6 +148,44 @@ class Page_Settings {
 	}
 
 
+	private static function get_existing_profile_nids() {
+
+		$nids = array();
+
+		$args = array(
+			'posts_per_page' => -1,
+			'post_type'      => Post_Type_Profile::get( 'post_type' ),
+			'meta_query'     => array(
+				array(
+					'key'     => '_wsuwp_nid',
+					'compare' => 'EXISTS',
+				),
+				array(
+					'key'     => '_wsuwp_nid',
+					'value'   => '',
+					'compare' => '!=',
+				),
+			),
+		);
+
+		$query = new \WP_Query( $args );
+
+		if ( $query->have_posts() ) {
+			while ( $query->have_posts() ) {
+				$query->the_post();
+				$id = get_the_ID();
+
+				$nids[] = get_post_meta( $id, '_wsuwp_nid', true );
+			}
+		}
+
+		natcasesort( $nids );
+
+		return $nids;
+
+	}
+
+
 	public static function people_directory_content() {
 
 		// check user capabilities
@@ -162,32 +200,61 @@ class Page_Settings {
 			<div class="notice hidden">
 				<p class="message"></p>
 			</div>
+
+			<h2>Settings</h2>
 			<form method="post" action="options.php">
 				<?php
 					settings_fields( self::$options_group );
 					do_settings_sections( self::$page_slug );
 				?>
-				<table class="form-table" role="presentation">
-					<tbody>
-						<tr>
-							<th scope="row"><label for="profile-nids">Import Profiles</label></th>
-							<td>
-								<div class="form-field term-description-wrap">
-										<label for="profile-nids">List profile nids to import. One per line.</label>
-										<textarea id="profile-nids" rows="10" placeholder="butch.cougar" <?php echo empty( $selected_university_org ) ? 'disabled' : ''; ?>></textarea>
-									</div>
-									<p class="submit">
-										<button type="button" id="import-profiles-btn" class="button button-primary">Import Profiles</button>		<span class="spinner"></span>
-									</p>
-								</div>
-							</td>
-						</tr>
-					</tbody>
-				</table>
+
 				<?php
 				submit_button();
 				?>
 			</form>
+
+			<hr>
+
+			<h2>Import Controls</h2>
+			<table class="form-table" role="presentation">
+				<tbody>
+					<tr>
+						<th scope="row"><label for="profile-nids">Import Profiles</label></th>
+						<td>
+							<div class="form-field term-description-wrap">
+									<label for="profile-nids">List profile nids to import. One per line.</label>
+									<textarea id="profile-nids" rows="10" placeholder="butch.cougar" <?php echo empty( $selected_university_org ) ? 'disabled' : ''; ?>></textarea>
+									<div class="wsu-unpublish-profiles__container">
+										<label>
+											<input type="checkbox" id="unpublish-profiles" value="true">
+											Unpublish profiles not in this list. This will only apply to profiles that were previously imported.
+										</label>
+									</div>
+								</div>
+								<p class="submit wsu-import-submit__container">
+									<button type="button" id="import-profiles-btn" class="button button-primary">Import Profiles List</button>		<span class="spinner"></span>
+								</p>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="profile-nids">Existing Profiles</label></th>
+						<td>
+							<div class="form-field term-description-wrap">
+								<?php
+								if ( $_REQUEST['list-profiles'] === 'true' ) {
+									$nids        = self::get_existing_profile_nids();
+									$nids_output = implode( $nids, '<br/>' );
+									echo '<div class="wsuwp-people-directory-settings-page__existing-profiles">' . $nids_output . '</div>';
+								} else {
+									echo '<button type="button" id="list-profiles-btn" class="button button-secondary">Display list of existing profile nids</button>		<span class="spinner"></span>';
+								}
+								?>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 		<?php
 
