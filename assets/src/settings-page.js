@@ -1,5 +1,4 @@
 import "./settings-page.scss";
-import { bind, create, groupBy } from "lodash";
 
 jQuery(document).ready(function () {
     (function ($) {
@@ -72,7 +71,7 @@ jQuery(document).ready(function () {
                 const data = await response.json();
 
                 if (Array.isArray(data)) {
-                    groupedOrgs = groupBy(data, "parent");
+                    groupedOrgs = lodash.groupBy(data, "parent");
                     const optionsString = buildOptionsString(groupedOrgs[0]);
                     orgSelectControl.append(optionsString);
                     formFields.tagParent.append(optionsString);
