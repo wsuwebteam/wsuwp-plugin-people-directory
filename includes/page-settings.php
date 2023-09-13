@@ -213,6 +213,10 @@ class Page_Settings {
 				?>
 			</form>
 
+			<?php
+
+			if ( ! empty( $selected_university_org ) ) {
+				?>
 			<hr>
 
 			<h2>Import Controls</h2>
@@ -242,9 +246,16 @@ class Page_Settings {
 						<td>
 							<div class="form-field term-description-wrap">
 								<?php
-								if ( $_REQUEST['list-profiles'] === 'true' ) {
+								if ( isset( $_REQUEST['list-profiles'] ) && $_REQUEST['list-profiles'] === 'true' ) {
 									$nids        = self::get_existing_profile_nids();
-									$nids_output = implode( $nids, '<br/>' );
+									$nids_output = '';
+
+									if ( version_compare( PHP_VERSION, '7.4.0' ) >= 0 ) {
+										$nids_output = implode( '<br/>', $nids );
+									} else {
+										$nids_output = implode( $nids, '<br/>' );
+									}
+
 									echo '<div class="wsuwp-people-directory-settings-page__existing-profiles">' . $nids_output . '</div>';
 								} else {
 									echo '<button type="button" id="list-profiles-btn" class="button button-secondary">Display list of existing profile nids</button>		<span class="spinner"></span>';
@@ -255,6 +266,9 @@ class Page_Settings {
 					</tr>
 				</tbody>
 			</table>
+				<?php
+			}
+			?>
 		</div>
 		<?php
 
