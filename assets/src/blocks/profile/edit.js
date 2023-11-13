@@ -12,6 +12,7 @@ import {
 	InnerBlocks,
 	MediaUpload,
 	MediaUploadCheck,
+	RichText,
 } from "@wordpress/block-editor";
 // import { useCopyToClipboard } from "@wordpress/compose";
 
